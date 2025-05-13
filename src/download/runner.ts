@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 
 export type CreateRunner = (
   context: BrowserContext,
-) => () => Promise<void> | Promise<() => Promise<void>>;
+) => (() => Promise<void>) | Promise<() => Promise<void>>;
 
 export const run = async (creators: CreateRunner[]) => {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
