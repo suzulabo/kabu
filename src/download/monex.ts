@@ -7,11 +7,10 @@ export const createMonexRunner: CreateRunner = (context) => {
 
     await page.goto('https://mxp2.monex.co.jp/pc/servlet/ITS/stkloan/LendStkBonusDescDispGuest');
 
-    let data = '';
+    const fragments = [];
 
     for (;;) {
-      data += await page.locator('table.table-style01 tbody').innerText();
-      console.log(data);
+      fragments.push(await page.locator('table.table-style01 tbody').innerText());
 
       const next = page.getByText('次へ ＞');
       if (!(await next.first().getAttribute('href'))) {
@@ -21,7 +20,8 @@ export const createMonexRunner: CreateRunner = (context) => {
       await page.waitForLoadState('networkidle');
     }
 
-    const output = data
+    const output = fragments
+      .join('\n')
       .split('\n')
       .filter((line) => !line.trim().startsWith('銘柄コード'))
       .join('\n');

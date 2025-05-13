@@ -1,4 +1,6 @@
 import { addYears, parse } from 'date-fns';
+import { loadMatsuiKashikabu } from '../data/matsuiKashikabu';
+import { loadMonexKashikabu } from '../data/monexKashikabu';
 import { loadMoneyBuETF } from '../data/moneyBuETF';
 import { loadRakutenKashikabu } from '../data/rakutenKashikabu';
 import { loadSbiETF } from '../data/sbiETF';
@@ -11,6 +13,8 @@ const listingDateMap = await loadMoneyBuETF();
 const kashiKabuMaps = {
   sbi: await loadSbiKashikabu(),
   rakuten: await loadRakutenKashikabu(),
+  matsui: await loadMatsuiKashikabu(),
+  monex: await loadMonexKashikabu(),
 };
 
 const listingThreshold = addYears(new Date(), -1.1);
@@ -19,6 +23,8 @@ const getKashikabuRate = (code: string) => {
   const rates = [
     ['SBI', kashiKabuMaps.sbi.get(code)],
     ['楽天', kashiKabuMaps.rakuten.get(code)],
+    ['松井', kashiKabuMaps.matsui.get(code)],
+    ['MONEX', kashiKabuMaps.monex.get(code)],
   ] as const;
 
   let maxRate = 0;
