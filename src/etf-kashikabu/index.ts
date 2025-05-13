@@ -99,7 +99,13 @@ const genRow = (code: string, etf: ETFValue) => {
 const main = async () => {
   const lines = [];
 
-  lines.push(
+  for (const [code, etf] of etfMap.entries()) {
+    lines.push(genRow(code, etf).join('\t'));
+  }
+
+  lines.sort();
+
+  const output = [
     [
       'コード',
       '名前',
@@ -112,12 +118,8 @@ const main = async () => {
       '上場日',
       'URL',
     ].join('\t'),
-  );
-  for (const [code, etf] of etfMap.entries()) {
-    lines.push(genRow(code, etf).join('\t'));
-  }
-
-  const output = lines.join('\n');
+    ...lines,
+  ].join('\n');
 
   await writeFile('data/etf-kashikabu.tsv', output, 'utf8');
 
