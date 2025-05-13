@@ -1,4 +1,7 @@
 import { addYears, parse } from 'date-fns';
+import { writeFile } from 'node:fs/promises';
+import { loadMatsuiKashikabu } from '../data/matsuiKashikabu';
+import { loadMonexKashikabu } from '../data/monexKashikabu';
 import { loadMoneyBuETF } from '../data/moneyBuETF';
 import { loadRakutenKashikabu } from '../data/rakutenKashikabu';
 import { loadSbiETF } from '../data/sbiETF';
@@ -11,6 +14,8 @@ const listingDateMap = await loadMoneyBuETF();
 const kashiKabuMaps = {
   sbi: await loadSbiKashikabu(),
   rakuten: await loadRakutenKashikabu(),
+  matsui: await loadMatsuiKashikabu(),
+  monex: await loadMonexKashikabu(),
 };
 
 const listingThreshold = addYears(new Date(), -1.1);
@@ -19,6 +24,8 @@ const getKashikabuRate = (code: string) => {
   const rates = [
     ['SBI', kashiKabuMaps.sbi.get(code)],
     ['楽天', kashiKabuMaps.rakuten.get(code)],
+    ['松井', kashiKabuMaps.matsui.get(code)],
+    ['MONEX', kashiKabuMaps.monex.get(code)],
   ] as const;
 
   let maxRate = 0;
@@ -89,8 +96,16 @@ const genRow = (code: string, etf: ETFValue) => {
   ];
 };
 
-const main = () => {
-  console.log(
+const main = async () => {
+  const lines = [];
+
+  for (const [code, etf] of etfMap.entries()) {
+    lines.push(genRow(code, etf).join('\t'));
+  }
+
+  lines.sort();
+
+  const output = [
     [
       'コード',
       '名前',
@@ -103,10 +118,12 @@ const main = () => {
       '上場日',
       'URL',
     ].join('\t'),
-  );
-  for (const [code, etf] of etfMap.entries()) {
-    console.log(genRow(code, etf).join('\t'));
-  }
+    ...lines,
+  ].join('\n');
+
+  await writeFile('data/etf-kashikabu.tsv', output, 'utf8');
+
+  console.log(output);
 };
 
-main();
+await main();
