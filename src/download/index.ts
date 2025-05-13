@@ -97,3 +97,6 @@ const main = async () => {
 };
 
 await main();
+
+//https://www.deal.matsui.co.jp/servlet/ITS/stock/StkLoanRateHistory;jsessionid=6520e8afd4bbf334df0362d30abe4693f450611a
+//https://mxp2.monex.co.jp/pc/servlet/ITS/stkloan/LendStkBonusDescDispGuest
