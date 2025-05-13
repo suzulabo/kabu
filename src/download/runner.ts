@@ -3,7 +3,9 @@ import readline from 'node:readline/promises';
 import type { BrowserContext } from 'playwright';
 import { chromium } from 'playwright';
 
-export type CreateRunner = (context: BrowserContext) => Promise<() => Promise<void>>;
+export type CreateRunner = (
+  context: BrowserContext,
+) => () => Promise<void> | Promise<() => Promise<void>>;
 
 export const run = async (creators: CreateRunner[]) => {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -19,7 +21,7 @@ export const run = async (creators: CreateRunner[]) => {
     }),
   );
 
-  await rl.question('Input Enter...');
+  await rl.question('[Starting] Input Enter...');
 
   try {
     await Promise.all(
@@ -27,7 +29,7 @@ export const run = async (creators: CreateRunner[]) => {
         return v();
       }),
     );
-    await rl.question('Input Enter...');
+    await rl.question('[Finished] Input Enter...');
   } finally {
     const cookies = await context.cookies();
     await writeFile('data/cookies.json', JSON.stringify(cookies));
