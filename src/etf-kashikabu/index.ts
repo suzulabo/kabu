@@ -1,4 +1,5 @@
 import { addYears, parse } from 'date-fns';
+import { writeFile } from 'node:fs/promises';
 import { loadMatsuiKashikabu } from '../data/matsuiKashikabu';
 import { loadMonexKashikabu } from '../data/monexKashikabu';
 import { loadMoneyBuETF } from '../data/moneyBuETF';
@@ -95,8 +96,10 @@ const genRow = (code: string, etf: ETFValue) => {
   ];
 };
 
-const main = () => {
-  console.log(
+const main = async () => {
+  const lines = [];
+
+  lines.push(
     [
       'コード',
       '名前',
@@ -111,8 +114,14 @@ const main = () => {
     ].join('\t'),
   );
   for (const [code, etf] of etfMap.entries()) {
-    console.log(genRow(code, etf).join('\t'));
+    lines.push(genRow(code, etf).join('\t'));
   }
+
+  const output = lines.join('\n');
+
+  await writeFile('data/etf-kashikabu.tsv', output, 'utf8');
+
+  console.log(output);
 };
 
-main();
+await main();
